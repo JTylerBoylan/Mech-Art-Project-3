@@ -12,9 +12,11 @@ DALLE_MODEL = "dall-e-3"
 DALLE_SIZE = "1792x1024"
 DALLE_QUALITY = "standard"
 
-DEFAULT_FOREST_URL = "https://files.oaiusercontent.com/file-jnzcU4cwtzWArMTwnwQx0v8b?se=2024-02-18T19%3A29%3A16Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3Df0d955e0-6d77-4f42-8729-9a123791a3fd.webp&sig=GDtyIxudIk6c5HRGvWg0smzgCRWVCzYtgnbycqcSFlk%3D"
+DEFAULT_FOREST_URL = "https://raw.githubusercontent.com/JTylerBoylan/Mech-Art-Project-3/main/default_forest.webp"
 
 app = Flask(__name__)
+
+client = OpenAI()
 
 image_url_queue = queue.Queue(maxsize=1)
 image_url_queue.put(DEFAULT_FOREST_URL)
@@ -69,6 +71,7 @@ def index():
 
 def input_loop():
     wish_list = []
+    time.sleep(2.0)
     while True:
         
         wish = input("Enter your wish: ")
@@ -95,9 +98,6 @@ def input_loop():
         image_url_queue.put(image_url)
 
         print("\n")
-
-
-client = OpenAI()
 
 def generate_image_prompt(wish_list: list[str]):
   response = client.chat.completions.create(
