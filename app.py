@@ -1,0 +1,135 @@
+import threading
+import queue
+import time
+import requests
+from flask import Flask, Response, render_template_string
+from openai import OpenAI
+
+GPT_MODEL = "gpt-4"
+GPT_PROMPT_FILE = "gpt-prompt.txt"
+
+DALLE_MODEL = "dall-e-3"
+DALLE_SIZE = "1792x1024"
+DALLE_QUALITY = "standard"
+
+DEFAULT_FOREST_URL = "https://files.oaiusercontent.com/file-jnzcU4cwtzWArMTwnwQx0v8b?se=2024-02-18T19%3A29%3A16Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3Df0d955e0-6d77-4f42-8729-9a123791a3fd.webp&sig=GDtyIxudIk6c5HRGvWg0smzgCRWVCzYtgnbycqcSFlk%3D"
+
+app = Flask(__name__)
+
+image_url_queue = queue.Queue(maxsize=1)
+image_url_queue.put(DEFAULT_FOREST_URL)
+
+with open(GPT_PROMPT_FILE, "r") as file:
+    gpt_prompt = file.read()
+
+def gen_frames():
+    while True:
+      image_url = image_url_queue.get_nowait()
+      image_url_queue.put(image_url)
+
+      response = requests.get(image_url)
+      if response.status_code == 200:
+          image_data = response.content 
+          yield (b'--frame\r\n'
+                  b'Content-Type: image/jpeg\r\n\r\n' + image_data + b'\r\n')
+          time.sleep(0.1)
+      else:
+          print(f"Failed to fetch image from {image_url}, status code: {response.status_code}")
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/')
+def index():
+    return render_template_string("""
+    <html>
+    <head>
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <img src="{{ url_for('video_feed') }}">
+    </body>
+    </html>
+    """)
+
+def input_loop():
+    wish_list = []
+    while True:
+        
+        wish = input("Enter your wish: ")
+
+        if wish == 'reset':
+            wish_list.clear()
+            image_url_queue.get_nowait()
+            image_url_queue.put(DEFAULT_FOREST_URL)
+            continue
+        
+        wish_list.append(wish)
+        print(f"Wish list: {wish_list}")
+
+        print(f"Generating prompt.")
+        prompt = generate_image_prompt(wish_list)
+        print(f"Prompt: {prompt}")
+
+        print(f"Generating image")
+        image_url = generate_image(prompt)
+        print(f"Image URL: {image_url}")
+
+        if not image_url_queue.empty():
+            image_url_queue.get_nowait()
+        image_url_queue.put(image_url)
+
+        print("\n")
+
+
+client = OpenAI()
+
+def generate_image_prompt(wish_list: list[str]):
+  response = client.chat.completions.create(
+    model=GPT_MODEL,
+    messages=[
+      {
+        "role": "system",
+        "content": gpt_prompt
+      },
+      {
+        "role": "user",
+        "content": ", ".join(wish_list)
+      }
+    ],
+    temperature=1,
+    max_tokens=1000,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0
+  )
+  return response.choices[0].message.content
+
+def generate_image(prompt: str):
+  response = client.images.generate(
+    model=DALLE_MODEL,
+    prompt=prompt,
+    size=DALLE_SIZE,
+    quality=DALLE_QUALITY,
+    n=1,
+  )
+  return response.data[0].url
+
+if __name__ == '__main__':
+    threading.Thread(target=input_loop, daemon=True).start()
+    app.run(host='0.0.0.0', port=5000)
