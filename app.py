@@ -112,11 +112,7 @@ def generate_image_prompt(wish_list: list[str]):
         "content": ", ".join(wish_list)
       }
     ],
-    temperature=1,
-    max_tokens=1000,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
+    max_tokens=1000
   )
   return response.choices[0].message.content
 
