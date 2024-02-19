@@ -3,7 +3,7 @@ import queue
 import time
 import requests
 from flask import Flask, Response, render_template_string
-from openai import OpenAI
+from openai import OpenAI, BadRequestError
 
 GPT_MODEL = "gpt-4"
 GPT_PROMPT_FILE = "gpt-prompt.txt"
@@ -26,6 +26,7 @@ with open(GPT_PROMPT_FILE, "r") as file:
 
 def gen_frames():
     while True:
+
       image_url = image_url_queue.get_nowait()
       image_url_queue.put(image_url)
 
@@ -33,8 +34,7 @@ def gen_frames():
       if response.status_code == 200:
           image_data = response.content 
           yield (b'--frame\r\n'
-                  b'Content-Type: image/jpeg\r\n\r\n' + image_data + b'\r\n')
-          time.sleep(0.1)
+                  b'Content-Type: image/png\r\n\r\n' + image_data + b'\r\n')
       else:
           print(f"Failed to fetch image from {image_url}, status code: {response.status_code}")
 
@@ -70,6 +70,7 @@ def index():
     """)
 
 def input_loop():
+    global image_updated
     wish_list = []
     time.sleep(2.0)
     while True:
@@ -83,15 +84,23 @@ def input_loop():
             continue
         
         wish_list.append(wish)
-        print(f"Wish list: {wish_list}")
+        wish_list_reverse = wish_list.copy().reverse()
+        print(f"Wish list: {wish_list_reverse}")
 
-        print(f"Generating prompt.")
-        prompt = generate_image_prompt(wish_list)
-        print(f"Prompt: {prompt}")
+        while True:
+          try:
+            print(f"Generating prompt...")
+            prompt = generate_image_prompt(wish_list_reverse)
+            print(f"Prompt: {prompt}")
 
-        print(f"Generating image")
-        image_url = generate_image(prompt)
-        print(f"Image URL: {image_url}")
+            print(f"Generating image...")
+            image_url = generate_image(prompt)       
+            print(f"Image URL: {image_url}")
+
+            break
+          except Exception as e:
+            print(f"Error generating image: {e}")
+            print(f"Trying again.")
 
         if not image_url_queue.empty():
             image_url_queue.get_nowait()
