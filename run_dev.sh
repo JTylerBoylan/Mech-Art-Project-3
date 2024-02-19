@@ -9,7 +9,7 @@ docker build -t mechart:latest "${SCRIPT_DIR}"
 # Start the Docker container
 docker run -it \
     --rm \
-    --net host \
+    -p 5000:5000 \
     -v "/${SCRIPT_DIR}:/app" \
     -e "OPENAI_API_KEY=$(cat openai-key.txt)" \
     mechart:latest \

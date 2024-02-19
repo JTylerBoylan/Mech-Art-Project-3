@@ -70,7 +70,6 @@ def index():
     """)
 
 def input_loop():
-    global image_updated
     wish_list = []
     time.sleep(2.0)
     while True:
@@ -84,7 +83,8 @@ def input_loop():
             continue
         
         wish_list.append(wish)
-        wish_list_reverse = wish_list.copy().reverse()
+        wish_list_reverse = wish_list.copy()
+        wish_list_reverse.reverse()
         print(f"Wish list: {wish_list_reverse}")
 
         while True:
@@ -101,6 +101,7 @@ def input_loop():
           except Exception as e:
             print(f"Error generating image: {e}")
             print(f"Trying again.")
+            time.sleep(1.0)
 
         if not image_url_queue.empty():
             image_url_queue.get_nowait()
