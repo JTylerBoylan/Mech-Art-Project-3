@@ -1,6 +1,6 @@
 # Wishing Well API Documentation
 
-![Project Sketch](https://github.com/JTylerBoylan/Mech-Art-Project-3/blob/main/saved/project_sketch.webp?raw=true)
+<img src="https://github.com/elwellb/WishingWell/blob/main/project_sketch.webp?raw=true" width="500">
 
 ## Overview
 
