@@ -31,12 +31,11 @@ def transcribe_audio_with_whisper(filename='output.wav'):
     # Send the audio file to the Whisper API for transcription
     transcript = client.audio.transcriptions.create(
         model="whisper-1", 
-        file=audio_file
+        file=audio_file,
+        response_format="text"
     )
     
-    # Extract and return the transcription text
-    transcription = transcript['text']
-    return transcription
+    return transcript
 
 # Main process
 if __name__ == "__main__":
