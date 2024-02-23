@@ -26,17 +26,16 @@ def transcribe_audio_with_whisper(filename='output.wav'):
     Transcribe the audio file using OpenAI's Whisper API.
     """
     # Load the audio file and encode it
-    with open(filename, "rb") as f:
-        audio_data = f.read()
+    audio_file= open(filename, "rb")
 
     # Send the audio file to the Whisper API for transcription
-    response = client.audio.create(
-        audio=audio_data,
-        model="whisper-large",  # You can change the model as needed
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1", 
+        file=audio_file
     )
     
     # Extract and return the transcription text
-    transcription = response['text']
+    transcription = transcript['text']
     return transcription
 
 # Main process
