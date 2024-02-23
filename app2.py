@@ -80,9 +80,7 @@ def input_loop():
 
         print("Say your wish.")
         wish = record_wish(3)
-
         wish = wish.rstrip()
-
         print(f"Wish: {wish}")
 
         if wish == 'reset':
@@ -109,7 +107,6 @@ def input_loop():
               image_url_queue.get_nowait()
           image_url_queue.put(image_url)
 
-          break
         except Exception as e:
           print(f"Error generating image: {e}")
           wish_list.pop()
