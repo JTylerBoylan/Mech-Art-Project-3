@@ -4,9 +4,7 @@ FROM python:latest
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y \
-        python3-pip \
-        portaudio19-dev \
-        flac
+        python3-pip
 
 RUN pip3 install \
         numpy  \
@@ -14,8 +12,8 @@ RUN pip3 install \
         flask \
         openai \
         requests \
-        SpeechRecognition \
-        pyaudio
+        sounddevice \
+        scipy
 
 # Create a new user with a specific UID and GID, and set up the workspace
 RUN useradd -m -u 1000 -s /bin/bash user && \
