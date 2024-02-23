@@ -30,7 +30,7 @@ def transcribe_audio_with_whisper(filename='output.wav'):
         audio_data = f.read()
 
     # Send the audio file to the Whisper API for transcription
-    response = client.Audio.create(
+    response = client.audio.create(
         audio=audio_data,
         model="whisper-large",  # You can change the model as needed
     )
