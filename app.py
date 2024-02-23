@@ -87,25 +87,24 @@ def input_loop():
         wish_list_reverse.reverse()
         print(f"Wish list: {wish_list_reverse}")
 
-        while True:
-          try:
-            print(f"Generating prompt...")
-            prompt = generate_image_prompt(wish_list_reverse)
-            print(f"Prompt: {prompt}")
+        try:
+          print(f"Generating prompt...")
+          prompt = generate_image_prompt(wish_list_reverse)
+          print(f"Prompt: {prompt}")
 
-            print(f"Generating image...")
-            image_url = generate_image(prompt)       
-            print(f"Image URL: {image_url}")
+          print(f"Generating image...")
+          image_url = generate_image(prompt)       
+          print(f"Image URL: {image_url}")
 
-            break
-          except Exception as e:
-            print(f"Error generating image: {e}")
-            print(f"Trying again.")
-            time.sleep(1.0)
+          if not image_url_queue.empty():
+              image_url_queue.get_nowait()
+          image_url_queue.put(image_url)
 
-        if not image_url_queue.empty():
-            image_url_queue.get_nowait()
-        image_url_queue.put(image_url)
+          break
+        except Exception as e:
+          print(f"Error generating image: {e}")
+          wish_list.pop()
+          time.sleep(1.0)
 
         print("\n")
 

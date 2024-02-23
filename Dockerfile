@@ -4,14 +4,18 @@ FROM python:latest
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y \
-        python3-pip
+        python3-pip \
+        portaudio19-dev \
+        flac
 
 RUN pip3 install \
         numpy  \
         opencv-python-headless  \
         flask \
         openai \
-        requests
+        requests \
+        SpeechRecognition \
+        pyaudio
 
 # Create a new user with a specific UID and GID, and set up the workspace
 RUN useradd -m -u 1000 -s /bin/bash user && \
