@@ -1,6 +1,6 @@
 import sounddevice as sd
 from scipy.io.wavfile import write
-import openai
+from openai import OpenAI
 import numpy as np
 
 client = OpenAI()

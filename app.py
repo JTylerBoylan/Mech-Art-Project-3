@@ -3,7 +3,7 @@ import queue
 import time
 import requests
 from flask import Flask, Response, render_template_string
-from openai import OpenAI, BadRequestError
+from openai import OpenAI
 
 GPT_MODEL = "gpt-4"
 GPT_PROMPT_FILE = "gpt-prompt.txt"
