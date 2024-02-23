@@ -79,7 +79,9 @@ def input_loop():
         input("Press enter to record a wish.")
 
         print("Say your wish.")
-        wish = get_wish(3)
+        wish = record_wish(3)
+
+        wish = wish.rstrip()
 
         print(f"Wish: {wish}")
 
@@ -115,7 +117,7 @@ def input_loop():
 
         print("\n")
 
-def get_wish(duration=5, sample_rate=44100):
+def record_wish(duration=5, sample_rate=44100):
     print(f"Recording for {duration} seconds...")
     recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=2, dtype='int16')
     sd.wait()
