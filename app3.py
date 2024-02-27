@@ -15,7 +15,7 @@ GPT_IMAGE_PROMPT_FILE = "gpt-image-prompt.txt"
 
 DALLE_MODEL = "dall-e-3"
 DALLE_SIZE = "1792x1024"
-DALLE_QUALITY = "standard"
+DALLE_QUALITY = "hd"
 
 DEFAULT_FOREST_URL = "https://raw.githubusercontent.com/JTylerBoylan/Mech-Art-Project-3/main/default_forest.webp"
 
@@ -90,10 +90,13 @@ def input_loop():
         wish = get_wishes_from_transcript(transcript)
         print(f"Wish: {wish}")
 
-        if wish == 'none':
+        wish = wish.rstrip().lower().replace("\"", "")
+
+        if (wish.find("none") != -1) or (len(wish) == 0):
+            print(f"Skipping empty wish...")
             continue
 
-        if wish == 'reset':
+        if wish.find("reset") != -1:
             wish_list.clear()
             image_url_queue.get_nowait()
             image_url_queue.put(DEFAULT_FOREST_URL)
