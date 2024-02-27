@@ -38,7 +38,7 @@ def transcribe_audio_with_whisper(filename='output.wav'):
 
 # Main process
 if __name__ == "__main__":
-    duration = 5  # Duration to record in seconds
+    duration = 30  # Duration to record in seconds
     sample_rate = 44100  # Sample rate for the recording
     
     # Record and save audio
