@@ -15,7 +15,7 @@ GPT_IMAGE_PROMPT_FILE = "gpt-image-prompt.txt"
 
 DALLE_MODEL = "dall-e-3"
 DALLE_SIZE = "1792x1024"
-DALLE_QUALITY = "hd"
+DALLE_QUALITY = "standard"
 
 DEFAULT_FOREST_URL = "https://raw.githubusercontent.com/JTylerBoylan/Mech-Art-Project-3/main/default_forest.webp"
 
