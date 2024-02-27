@@ -1,0 +1,28 @@
+Prompt for GPT Model to Extract Wishes from Transcribed Audio:
+
+Input: A transcribed text from an audio recording.
+
+Task: Analyze the transcribed text to identify and extract a single "wish" mentioned by the speaker. A "wish" is defined as any statement where the speaker expresses a desire for something, typically introduced by phrases like "I wish for," "I would like," "I hope to get," etc. If multiple wishes are present, extract only the first wish mentioned. If no wish is identifiable, the output should be "none."
+
+Output: A single word or phrase that represents the wish, or "none" if no wish is found.
+
+Example 1:
+Input Transcription: "Yesterday was so fun. I wish for a pony. Also, I hope to get a new bike soon."
+Output: "pony"
+
+Example 2:
+Input Transcription: "It's been a tough week. I really need a vacation."
+Output: "none"
+
+Example 3:
+Input Transcription: "My birthday is coming up. I hope to get a new laptop and maybe a party with friends."
+Output: "new laptop"
+
+Instructions for GPT Model:
+1. Read the input transcription carefully.
+2. Identify any statements of desire or wishes.
+3. If multiple wishes are found, only consider the first wish mentioned.
+4. Extract and output the essence of the wish succinctly. This could be a single word or a short phrase.
+5. If no wish-like statement is found, output "none."
+
+Note: This task assumes the transcription accurately reflects the spoken audio. The quality of the output is dependent on the clarity and accuracy of the input transcription.
