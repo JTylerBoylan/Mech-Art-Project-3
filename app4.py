@@ -48,6 +48,7 @@ def transcribe_audio(audio_lock : threading.Lock, transcribe_lock : threading.Lo
         audio_lock.release()
 
         transcribe_lock.acquire()
+        print("Transcribing audio...")
         transcript = client.audio.transcriptions.create(
             model="whisper-1", 
             file=audio_file,
@@ -68,8 +69,5 @@ if __name__ == '__main__':
     audio_thread.start()
     transcribe_thread.start()
     
-    try:
-        audio_thread.join()
-        transcribe_thread.join()
-    except KeyboardInterrupt:
-        print("Exiting...")
+    audio_thread.join()
+    transcribe_thread.join()
