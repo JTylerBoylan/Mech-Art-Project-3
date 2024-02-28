@@ -30,13 +30,14 @@ with open(GPT_IMAGE_PROMPT_FILE, "r") as file:
     
 def record_audio(audio_lock : threading.Lock):
     while True:
+        audio_lock.acquire()
         print(f"Recording for {RECORDING_DURATION} seconds...")
         recording = sd.rec(int(RECORDING_DURATION * RECORDING_RATE), samplerate=RECORDING_RATE, channels=2, dtype='int16')
         sd.wait()
         print("Recording complete.")
-        audio_lock.acquire()
         write('output.wav', RECORDING_RATE, recording)
         audio_lock.release()
+        time.sleep(0.1)
         
 if __name__ == '__main__':
     
