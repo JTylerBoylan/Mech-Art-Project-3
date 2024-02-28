@@ -38,13 +38,38 @@ def record_audio(audio_lock : threading.Lock):
         write('output.wav', RECORDING_RATE, recording)
         audio_lock.release()
         time.sleep(0.1)
+
+transcript = ""
+def transcribe_audio(audio_lock : threading.Lock, transcribe_lock : threading.Lock):
+    global transcript
+    while True:
+        audio_lock.acquire()
+        audio_file = open('output.wav', "rb")
+        audio_lock.release()
+
+        transcribe_lock.acquire()
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1", 
+            file=audio_file,
+            response_format="text"
+        )
+        print("Transcription:", transcript)
+        transcribe_lock.release()
+        time.sleep(0.1)
         
 if __name__ == '__main__':
     
     audio_lock = threading.Lock()
+    transcribe_lock = threading.Lock()
     
     audio_thread = threading.Thread(target=record_audio, args=(audio_lock,))
+    transcribe_thread = threading.Thread(target=transcribe_audio, args=(audio_lock, transcribe_lock))
     
     audio_thread.start()
+    transcribe_thread.start()
     
-    audio_thread.join()
+    try:
+        audio_thread.join()
+        transcribe_thread.join()
+    except KeyboardInterrupt:
+        print("Exiting...")
