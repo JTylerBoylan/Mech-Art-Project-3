@@ -16,6 +16,9 @@ DALLE_QUALITY = "standard"
 
 DEFAULT_FOREST_URL = "https://raw.githubusercontent.com/JTylerBoylan/Mech-Art-Project-3/main/default_forest.webp"
 
+RECORD_DURATION = 10
+RECORD_SAMPLE_RATE = 44100
+
 app = Flask(__name__)
 
 client = OpenAI()
@@ -79,7 +82,7 @@ def input_loop():
         input("Press enter to record a wish.")
 
         print("Say your wish.")
-        wish = record_wish(3)
+        wish = record_wish()
         wish = wish.rstrip()
         print(f"Wish: {wish}")
 
@@ -114,11 +117,11 @@ def input_loop():
 
         print("\n")
 
-def record_wish(duration=5, sample_rate=44100):
-    print(f"Recording for {duration} seconds...")
-    recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=2, dtype='int16')
+def record_wish():
+    print(f"Recording for {RECORD_DURATION} seconds...")
+    recording = sd.rec(int(RECORD_DURATION * RECORD_SAMPLE_RATE), samplerate=RECORD_SAMPLE_RATE, channels=2, dtype='int16')
     sd.wait()
-    write('output.wav', sample_rate, recording)
+    write('output.wav', RECORD_SAMPLE_RATE, recording)
     audio_file= open('output.wav', "rb")
     transcript = client.audio.transcriptions.create(
         model="whisper-1", 
