@@ -144,11 +144,12 @@ def generate_image(prompt_lock : threading.Lock, image_url_lock : threading.Lock
     while not quit_app:
         prompt_lock.acquire()
         print(f"Generating image...")
-        response = client.images.create(
+        response = client.images.generate(
             model=DALLE_MODEL,
             prompt=prompt,
             size=DALLE_SIZE,
-            quality=DALLE_QUALITY
+            quality=DALLE_QUALITY,
+            n=1,
         )
         prompt_lock.release()
 
