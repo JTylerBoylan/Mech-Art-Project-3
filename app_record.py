@@ -7,7 +7,7 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 from openai import OpenAI
 
-RECORDING_DURATION = 30
+RECORDING_DURATION = 10
 RECORDING_SAMPLE_RATE = 44100
 
 GPT_MODEL = "gpt-4"
@@ -185,6 +185,10 @@ def generate_image(prompt: str):
     n=1,
   )
   return response.data[0].url
+
+def save_image_url(image_url: str):
+  with open('url-log.txt', 'a') as f:
+    f.write(image_url + '\n')
 
 if __name__ == '__main__':
     threading.Thread(target=input_loop, daemon=True).start()
