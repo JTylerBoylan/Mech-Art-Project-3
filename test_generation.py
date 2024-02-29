@@ -3,15 +3,10 @@ import queue
 import time
 import requests
 from flask import Flask, Response, render_template_string
-import sounddevice as sd
-from scipy.io.wavfile import write
 from openai import OpenAI
 
-RECORDING_DURATION = 30
-
 GPT_MODEL = "gpt-4"
-GPT_AUDIO_PROMPT_FILE = "gpt-audio-prompt.txt"
-GPT_IMAGE_PROMPT_FILE = "gpt-image-prompt.txt"
+GPT_PROMPT_FILE = "gpt-image-prompt.txt"
 
 DALLE_MODEL = "dall-e-3"
 DALLE_SIZE = "1792x1024"
@@ -26,11 +21,8 @@ client = OpenAI()
 image_url_queue = queue.Queue(maxsize=1)
 image_url_queue.put(DEFAULT_FOREST_URL)
 
-with open(GPT_AUDIO_PROMPT_FILE, "r") as file:
-    gpt_audio_prompt = file.read()
-
-with open(GPT_IMAGE_PROMPT_FILE, "r") as file:
-    gpt_image_prompt = file.read()
+with open(GPT_PROMPT_FILE, "r") as file:
+    gpt_prompt = file.read()
 
 def gen_frames():
     while True:
@@ -81,22 +73,10 @@ def input_loop():
     wish_list = []
     time.sleep(2.0)
     while True:
+        
+        wish = input("Enter your wish: ")
 
-        print(f"Recording audio for {RECORDING_DURATION} seconds...")
-        transcript = get_audio_transcript(RECORDING_DURATION)
-        print(f"Transcript: {transcript}")
-
-        print(f"Getting wishes...")
-        wish = get_wishes_from_transcript(transcript)
-        print(f"Wish: {wish}")
-
-        wish = wish.rstrip().lower().replace("\"", "")
-
-        if (wish.find("none") != -1) or (len(wish) == 0):
-            print(f"Skipping empty wish...")
-            continue
-
-        if wish.find("reset") != -1:
+        if wish == 'reset':
             wish_list.clear()
             image_url_queue.get_nowait()
             image_url_queue.put(DEFAULT_FOREST_URL)
@@ -120,6 +100,7 @@ def input_loop():
               image_url_queue.get_nowait()
           image_url_queue.put(image_url)
 
+          break
         except Exception as e:
           print(f"Error generating image: {e}")
           wish_list.pop()
@@ -127,42 +108,13 @@ def input_loop():
 
         print("\n")
 
-def get_audio_transcript(duration=5, sample_rate=44100):
-    recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=2, dtype='int16')
-    sd.wait()
-    write('output.wav', sample_rate, recording)
-    audio_file= open('output.wav', "rb")
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1", 
-        file=audio_file,
-        response_format="text"
-    )
-    return transcript
-
-def get_wishes_from_transcript(audio: str):
-  response = client.chat.completions.create(
-    model=GPT_MODEL,
-    messages=[
-      {
-        "role": "system",
-        "content": gpt_audio_prompt
-      },
-      {
-        "role": "user",
-        "content": audio
-      }
-    ],
-    max_tokens=1000
-  )
-  return response.choices[0].message.content
-
 def generate_image_prompt(wish_list: list[str]):
   response = client.chat.completions.create(
     model=GPT_MODEL,
     messages=[
       {
         "role": "system",
-        "content": gpt_image_prompt
+        "content": gpt_prompt
       },
       {
         "role": "user",

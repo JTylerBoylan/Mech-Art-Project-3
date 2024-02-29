@@ -119,6 +119,9 @@ def input_loop():
           image_url = generate_image(prompt)       
           print(f"Image URL: {image_url}")
 
+          save_image_url(image_url)
+          print(f"Image URL saved to log.")
+
           if not image_url_queue.empty():
               image_url_queue.get_nowait()
           image_url_queue.put(image_url)
