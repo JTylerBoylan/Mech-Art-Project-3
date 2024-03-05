@@ -2,6 +2,9 @@ import threading
 import queue
 import time
 import requests
+import hashlib
+import os
+from datetime import datetime
 from flask import Flask, Response, render_template_string
 import sounddevice as sd
 from scipy.io.wavfile import write
@@ -119,8 +122,8 @@ def input_loop():
           image_url = generate_image(prompt)       
           print(f"Image URL: {image_url}")
 
-          save_image_url(image_url)
-          print(f"Image URL saved to log.")
+          save_image(image_url)
+          print(f"Image saved to images.")
 
           if not image_url_queue.empty():
               image_url_queue.get_nowait()
@@ -189,9 +192,19 @@ def generate_image(prompt: str):
   )
   return response.data[0].url
 
-def save_image_url(image_url: str):
-  with open('url-log.txt', 'a') as f:
-    f.write(image_url + '\n')
+def save_image(image_url: str):
+  current_time = datetime.now().isoformat()
+  hash_object = hashlib.sha256(current_time.encode())
+  hex_dig = hash_object.hexdigest()
+  filename = f"images/{hex_dig}.png"
+  response = requests.get(image_url)
+  if response.status_code == 200:
+      with open(filename, 'wb') as file:
+          file.write(response.content)
+      print(f"Image saved as {filename}")
+  else:
+      print(f"Failed to retrieve the image. Status code: {response.status_code}")
+
 
 if __name__ == '__main__':
     threading.Thread(target=input_loop, daemon=True).start()
